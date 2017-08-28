@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A229CB881F5424AA00D51C1B"
+               BlueprintIdentifier = "9CE7E5D81DE5A40900C8BA5A"
                BuildableName = "Combinestagram.app"
                BlueprintName = "Combinestagram"
                ReferencedContainer = "container:Combinestagram.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A229CB881F5424AA00D51C1B"
+            BlueprintIdentifier = "9CE7E5D81DE5A40900C8BA5A"
             BuildableName = "Combinestagram.app"
             BlueprintName = "Combinestagram"
             ReferencedContainer = "container:Combinestagram.xcodeproj">
@@ -55,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A229CB881F5424AA00D51C1B"
+            BlueprintIdentifier = "9CE7E5D81DE5A40900C8BA5A"
             BuildableName = "Combinestagram.app"
             BlueprintName = "Combinestagram"
             ReferencedContainer = "container:Combinestagram.xcodeproj">
@@ -74,7 +74,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A229CB881F5424AA00D51C1B"
+            BlueprintIdentifier = "9CE7E5D81DE5A40900C8BA5A"
             BuildableName = "Combinestagram.app"
             BlueprintName = "Combinestagram"
             ReferencedContainer = "container:Combinestagram.xcodeproj">

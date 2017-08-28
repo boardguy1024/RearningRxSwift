@@ -20,9 +20,11 @@
  * THE SOFTWARE.
  */
 
+import Foundation
 import UIKit
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
-  var window: UIWindow?
+class PhotoWriter: NSObject {
+  typealias Callback = (NSError?)->Void
+
 }
+
