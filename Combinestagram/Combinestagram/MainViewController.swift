@@ -60,6 +60,8 @@ class MainViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        print("resources: \(RxSwift.Resources.total)")
     }
     
     @IBAction func actionClear() {
@@ -67,10 +69,23 @@ class MainViewController: UIViewController {
     }
     
     @IBAction func actionSave() {
+        
+        guard let image = imagePreview.image else { return }
+        
+        PhotoWriter.save(image).subscribe(onError: { [weak self] error in
+            
+            self?.showMessage("Error", description: error.localizedDescription )
+            
+        }, onCompleted: { [weak self] in
+            self?.showMessage("Saved")
+            self?.actionClear()
+        })
+        .disposed(by: bag)
+        
     }
     
     @IBAction func actionAdd() {
-       // images.value.append(UIImage(named: "IMG_1907.jpg")!)
+        // images.value.append(UIImage(named: "IMG_1907.jpg")!)
         
         let photosViewController = storyboard!.instantiateViewController(
             withIdentifier: "PhotosViewController") as! PhotosViewController
@@ -85,7 +100,7 @@ class MainViewController: UIViewController {
             },onDisposed: {
                 print("completed photo selection")
         })
-        .addDisposableTo(bag)
+            .addDisposableTo(photosViewController.bag)
     }
     
     func showMessage(_ title: String, description: String? = nil) {

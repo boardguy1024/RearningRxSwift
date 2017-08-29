@@ -22,9 +22,69 @@
 
 import Foundation
 import UIKit
+import RxSwift
 
 class PhotoWriter: NSObject {
-  typealias Callback = (NSError?)->Void
-
+  //  typealias Callback = (NSError?)->Void
+   
+    private var callback: (NSError?) -> Void
+    
+    private init(callback: @escaping (NSError?) -> Void) {
+        self.callback = callback
+    }
+    
+    static func save(_ image: UIImage) -> Observable<Void> {
+        
+        return Observable.create({ observer in
+          
+            let writer = PhotoWriter(callback: { (error) in
+                
+                if let error = error {
+                    observer.onError(error)
+                } else {
+                    observer.onCompleted()
+                }
+            })
+            
+            UIImageWriteToSavedPhotosAlbum(image, writer, #selector(PhotoWriter.image(_:didFinishiSavingWithError:contextInfo:)), nil)
+          
+            return Disposables.create()
+        })
+    }
+    
+    // MainVC화면에서 save 버튼을 누르게되면 photo.save()가 호출되고 이미지가 정상완료되면 error == nil 이되고 
+    // 이미지저장 실패되면 error != nil 이 된다.  그 옵셔널형의 error 객체를 callback(error) 를 실행
+    func image(_ image: UIImage, didFinishiSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
+        callback(error)
+        
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
