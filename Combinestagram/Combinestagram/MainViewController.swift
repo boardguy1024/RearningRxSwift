@@ -32,6 +32,7 @@ class MainViewController: UIViewController {
     
     private let bag = DisposeBag()
     private let images = Variable<[UIImage]>([])
+    private var imageCache = [Int]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +67,7 @@ class MainViewController: UIViewController {
     
     @IBAction func actionClear() {
         images.value = []
+        imageCache = []
     }
     
     @IBAction func actionSave() {
@@ -92,15 +94,46 @@ class MainViewController: UIViewController {
         navigationController!.pushViewController(photosViewController, animated:
             true)
         
-        photosViewController.selectedPhotos.subscribe(onNext: {
-            [weak self] newImage in
-            
-            self?.images.value.append(newImage)
-            
-            },onDisposed: {
-                print("completed photo selection")
-        })
-            .addDisposableTo(photosViewController.bag)
+        let newPhotos = photosViewController.selectedPhotos
+                        .share()
+        
+        newPhotos
+            .filter {
+                newImage in
+                return newImage.size.width > newImage.size.height
+            }
+            .filter { [weak self] newImage in
+                let length = UIImagePNGRepresentation(newImage)?.count ?? 0
+                print("newImageByteLength : \(length)")
+                guard self?.imageCache.contains(length) == false else {
+                    return false
+                }
+                self?.imageCache.append(length)
+                return true
+            }
+            .subscribe(onNext: { [weak self] photo in
+                self?.images.value.append(photo)
+                }, onDisposed: {
+                   print("newPhotos disposed")
+            })
+            .disposed(by: photosViewController.bag)
+        
+        
+        // 같은 Observable 객체에대해서 .ignoreElement() 를 필터링
+        newPhotos
+            .ignoreElements()
+            .subscribe(onCompleted: { [weak self] in
+                self?.updateNavigationIcon()
+            })
+            .disposed(by: photosViewController.bag)
+    }
+    
+    private func updateNavigationIcon() {
+        let icon = imagePreview.image?
+            .scaled(CGSize(width: 22, height: 22))
+            .withRenderingMode(.alwaysOriginal)
+        
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: icon, style: .done, target: nil, action: nil)
     }
     
     func showMessage(_ title: String, description: String? = nil) {
@@ -109,3 +142,35 @@ class MainViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
