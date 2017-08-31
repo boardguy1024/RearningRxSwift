@@ -29,7 +29,6 @@ class PhotosViewController: UICollectionViewController {
     // MARK: public properties
     
     // MARK: private properties
-    
     let bag = DisposeBag()
 
     fileprivate let selectedPhotosSubject = PublishSubject<UIImage>()
@@ -39,6 +38,7 @@ class PhotosViewController: UICollectionViewController {
     
     private lazy var photos = PhotosViewController.loadPhotos()
     private lazy var imageManager = PHCachingImageManager()
+    
     
     private lazy var thumbnailSize: CGSize = {
         let cellSize = (self.collectionViewLayout as! UICollectionViewFlowLayout).itemSize
@@ -56,12 +56,48 @@ class PhotosViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let authorized = PHPhotoLibrary.authorized.share()
+        
+        // 인증실패하면 subscribe onNext이벤트 없이 dispose
+        authorized
+            .skipWhile { $0 == false }
+            .take(1)
+            .subscribe(onNext: { [weak self] _ in
+                self?.photos = PhotosViewController.loadPhotos()
+                DispatchQueue.main.async {
+                    self?.collectionView?.reloadData()
+                }
+                }, onDisposed: {
+                    print("authorized oberver disposed")
+            })
+            .disposed(by: bag)
+        
+        // 인증실패시 에러메세지를 표시
+        authorized
+            .takeLast(1)
+            .filter { $0 == false }
+            .subscribe(onNext: { [weak self] _ in
+                guard let errorMessage = self?.errorMessage else { return }
+                DispatchQueue.main.async(execute: errorMessage)
+            })
+            .disposed(by: bag)
+
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         selectedPhotosSubject.onCompleted()
+    }
+    
+    private func errorMessage() {
+        alert(title: "No access to camera Roll", text: "You can grant access to this App from the Setting app")
+            .take(5, scheduler: MainScheduler.instance)
+            .subscribe(onDisposed: { [weak self] in
+                self?.dismiss(animated: true, completion: nil)
+                self?.navigationController?.popViewController(animated: true)
+            })
+            .disposed(by: bag)
     }
     
     // MARK: UICollectionView

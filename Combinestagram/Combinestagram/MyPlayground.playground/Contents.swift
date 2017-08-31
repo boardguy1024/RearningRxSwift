@@ -27,43 +27,43 @@ func print<T: CustomStringConvertible>(label: String, event: Event<T>) {
     print(label, event.element ?? event.error ?? event)
 }
 
-example(of: "") {
+struct Student {
+    
+    var score: Variable<Int>
+}
+
+example(of: "flatMapFirst") {
+    
+    
+    let park = Student(score: Variable(80))
+    let kim = Student(score: Variable(90))
+    
+    let student = PublishSubject<Student>()
+    
+    student.asObservable()
+        .flatMapFirst {
+            $0.score.asObservable()
+    }
+        .subscribe(onNext: {
+            print($0)
+        })
+        .disposed(by: bag)
+    
+    
+    student.onNext(park)
+    
+    park.score.value = 85
+    
+    student.onNext(kim)
+    
+    park.score.value = 95
+    
+    kim.score.value = 100
     
     
     
     
 }
-
-let numbers = Observable<Int>.create { observer in
-    
-    let start = getStartNumber()
-    observer.onNext(start)
-    observer.onNext(start + 1)
-    observer.onNext(start + 2)
-    observer.onCompleted()
-    
-    return Disposables.create()
-}
-
-
-var start = 0
-
-func getStartNumber() -> Int {
-    start += 1
-    return start
-}
-
-numbers.subscribe(onNext: { element in
-    print("Element [\(element)]")
-}, onCompleted: {
-    print("--------------")
-})
-
-numbers.subscribe(onNext: { element in
-    print("Element [\(element)]")
-}, onCompleted: {
-    print("--------------")
-})
 
 
 
