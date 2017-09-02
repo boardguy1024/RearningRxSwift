@@ -30,6 +30,7 @@
 		9C8332801DF73BA90067DC80 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C8332861DF73BBD0067DC80 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9CE37EC61DF73EE300E4E310 /* Event.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		A229CBAA1F58FF9C00D51C1B /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +95,7 @@
 		9C8332731DF73BA90067DC80 /* GitFeed */ = {
 			isa = PBXGroup;
 			children = (
+				A229CBAA1F58FF9C00D51C1B /* MyPlayground.playground */,
 				9C30C3F71E06FC3900C6C510 /* Assets */,
 				9C8332761DF73BA90067DC80 /* ActivityController.swift */,
 				9CE37EC61DF73EE300E4E310 /* Event.swift */,
