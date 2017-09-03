@@ -25,15 +25,34 @@ import RxSwift
 import RxCocoa
 import Kingfisher
 
+func cachedFileURL(_ fileName: String) -> URL {
+    
+   let  url =  FileManager.default
+        .urls(for: .cachesDirectory, in: .allDomainsMask)
+        .first!
+        .appendingPathComponent(fileName)
+    
+    print("file url : \(url)")
+    return url
+}
+
 class ActivityController: UITableViewController {
     
     let repo = "ReactiveX/RxSwift"
-    
     fileprivate let events = Variable<[Event]>([])
     fileprivate let bag = DisposeBag()
     
+    private let eventsFileURL = cachedFileURL("events.plist")
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+     
+        let eventsArray = (NSArray(contentsOf: eventsFileURL) as? [[String: Any]]) ?? []
+        
+        //eventsArray는 [[String: Any]] or [] 이므로 [Event] 로 변환하기 위해서 .flatMap을 사용한다.
+        events.value = eventsArray.flatMap(Event.init)
+        
         title = repo
         
         self.refreshControl = UIRefreshControl()
@@ -84,7 +103,6 @@ class ActivityController: UITableViewController {
             }
             .subscribe(onNext: { [weak self] newEvents in
                 
-                
                 self?.processEvents(newEvents)
             })
             .disposed(by: bag)
@@ -101,6 +119,14 @@ class ActivityController: UITableViewController {
         }
         events.value = updatedEvents
         self.tableView.reloadData()
+        
+        // [event] -> dictionary 의 NSArray 로 변환하자!
+        
+        print("eventsArray before: \(updatedEvents.map { $0.dictionary })")
+        
+        let eventsArray = updatedEvents.map { $0.dictionary } as NSArray
+        
+        eventsArray.write(to: eventsFileURL, atomically: true)
     }
     
     // MARK: - Table Data Source
