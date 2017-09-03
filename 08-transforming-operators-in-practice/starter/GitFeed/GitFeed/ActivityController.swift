@@ -27,7 +27,7 @@ import Kingfisher
 
 func cachedFileURL(_ fileName: String) -> URL {
     
-   let  url =  FileManager.default
+    let  url =  FileManager.default
         .urls(for: .cachesDirectory, in: .allDomainsMask)
         .first!
         .appendingPathComponent(fileName)
@@ -40,14 +40,16 @@ class ActivityController: UITableViewController {
     
     let repo = "ReactiveX/RxSwift"
     fileprivate let events = Variable<[Event]>([])
+    fileprivate let lastModified = Variable<NSString?>(nil)
+    
     fileprivate let bag = DisposeBag()
     
     private let eventsFileURL = cachedFileURL("events.plist")
-    
+    private let modifiedFileURL = cachedFileURL("modified.txt")
     
     override func viewDidLoad() {
         super.viewDidLoad()
-     
+        
         let eventsArray = (NSArray(contentsOf: eventsFileURL) as? [[String: Any]]) ?? []
         
         //eventsArray는 [[String: Any]] or [] 이므로 [Event] 로 변환하기 위해서 .flatMap을 사용한다.
@@ -62,11 +64,16 @@ class ActivityController: UITableViewController {
         refreshControl.tintColor = UIColor.darkGray
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        
+        lastModified.value = try? NSString(contentsOf: modifiedFileURL, usedEncoding: nil)
         refresh()
     }
     
     func refresh() {
-        fetchEvents(repo: repo)
+        
+        DispatchQueue.global().async {
+            self.fetchEvents(repo: self.repo)
+        }
     }
     
     func fetchEvents(repo: String) {
@@ -76,10 +83,16 @@ class ActivityController: UITableViewController {
                 return URL(string: "http://api.github.com/repos/\(urlString)/events")!
                 
             }
-            .map { url -> URLRequest in
-                return URLRequest(url: url)
+            .map { [weak self] url -> URLRequest in
+                
+                var request = URLRequest(url: url)
+                if let modifiedHeader = self?.lastModified.value {
+                    request.addValue(modifiedHeader as String, forHTTPHeaderField: "Last-Modified")
+                }
+                return request
             }
             .flatMap { request -> Observable<(HTTPURLResponse, Data)> in
+                print("main: \(Thread.isMainThread)")
                 return URLSession.shared.rx.response(request: request)
         }
         
@@ -91,9 +104,10 @@ class ActivityController: UITableViewController {
             .map { _ , data -> [[String: Any]] in
                 
                 guard let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) , let result = jsonObject as? [[String: Any]] else { return [] }
+                
                 return result
             }
-            // 이벤트객체가 포함되어있는 객체만 필터링하자!!
+            // 객체가 한개도없으면 false
             .filter { resultObjects in
                 return resultObjects.count > 0
             }
@@ -102,14 +116,39 @@ class ActivityController: UITableViewController {
                 
             }
             .subscribe(onNext: { [weak self] newEvents in
-                
                 self?.processEvents(newEvents)
             })
             .disposed(by: bag)
         
+        
+        response
+            .filter { response, _ in
+                return 200..<400 ~= response.statusCode
+            }
+            .flatMap { response, _ -> Observable<NSString> in
+                print("main: \(Thread.isMainThread)")
+                //print("response.allHeaderFields: \(response.allHeaderFields)")
+                
+                guard let value = response.allHeaderFields["Last-Modified"] as? NSString else {
+                    
+                    return Observable.never()
+                }
+                return Observable.just(value)
+            }
+            .subscribe(onNext: { [weak self] modifiedHeader in
+                // print("modifiedHeader: \(modifiedHeader)")
+                guard let strongSelf = self else { return }
+                strongSelf.lastModified.value = modifiedHeader
+                try? modifiedHeader.write(to: strongSelf.modifiedFileURL, atomically: true, encoding: String.Encoding.utf8.rawValue)
+            })
+            .disposed(by: bag)
+        
+        
     }
     
     func processEvents(_ newEvents: [Event]) {
+        
+        print("main: \(Thread.isMainThread)")
         
         var updatedEvents = newEvents + events.value
         
@@ -118,11 +157,14 @@ class ActivityController: UITableViewController {
             updatedEvents = Array<Event>(updatedEvents.prefix(upTo: 50))
         }
         events.value = updatedEvents
-        self.tableView.reloadData()
+        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
         
         // [event] -> dictionary 의 NSArray 로 변환하자!
         
-        print("eventsArray before: \(updatedEvents.map { $0.dictionary })")
+        // print("eventsArray before: \(updatedEvents.map { $0.dictionary })")
         
         let eventsArray = updatedEvents.map { $0.dictionary } as NSArray
         

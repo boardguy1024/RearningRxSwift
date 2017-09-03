@@ -95,10 +95,10 @@
 		9C8332731DF73BA90067DC80 /* GitFeed */ = {
 			isa = PBXGroup;
 			children = (
+				9CE37EC61DF73EE300E4E310 /* Event.swift */,
 				A229CBAA1F58FF9C00D51C1B /* MyPlayground.playground */,
 				9C30C3F71E06FC3900C6C510 /* Assets */,
 				9C8332761DF73BA90067DC80 /* ActivityController.swift */,
-				9CE37EC61DF73EE300E4E310 /* Event.swift */,
 				9C8332741DF73BA90067DC80 /* AppDelegate.swift */,
 			);
 			path = GitFeed;

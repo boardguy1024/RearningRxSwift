@@ -12,6 +12,10 @@ import RxCocoa
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var tableView: UITableView!
+    
+    var items = Variable<[Event]>([])
+
     let repoName = "ReactiveX/RxSwift"
     
     let bag = DisposeBag()
@@ -20,6 +24,8 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         getJSonData()
+        
+        
     }
     
     func getJSonData() {
@@ -51,9 +57,8 @@ class ViewController: UIViewController {
             .map { objects in
                 return objects.flatMap(Event.init)
             }
-            .subscribe(onNext: {
-               print("name: \($0[1].name)")
-               print("imageUrl: \($0[1].imageUrl)")
+            .subscribe(onNext: { objects in
+               self.items.value = objects
             })
             .disposed(by: bag)
     }
