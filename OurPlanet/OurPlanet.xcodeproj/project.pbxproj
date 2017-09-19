@@ -12,6 +12,8 @@
 		3D46E62D1E258DFC0090C97B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D46E62B1E258DFC0090C97B /* Main.storyboard */; };
 		3D46E62F1E258DFC0090C97B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3D46E62E1E258DFC0090C97B /* Assets.xcassets */; };
 		3D46E6321E258DFC0090C97B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3D46E6301E258DFC0090C97B /* LaunchScreen.storyboard */; };
+		A233F2BF1F6CE65D00808B93 /* RxCocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A233F2BE1F6CE65D00808B93 /* RxCocoa.framework */; };
+		A233F2C11F6CE66100808B93 /* RxSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A233F2C01F6CE66100808B93 /* RxSwift.framework */; };
 		C9EE84558065F39B6F4F65B4 /* Pods_OurPlanet.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EF74F7158FA18FD08C3F92F /* Pods_OurPlanet.framework */; };
 		D8D4B3B53FB9DBEFD316986D /* EventCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D4B590E2532FBB4E15A320 /* EventCell.swift */; };
 		D8D4B48C386519868A7FCF37 /* EOLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D4B8B9345BB7B3111B3486 /* EOLocation.swift */; };
@@ -33,6 +35,9 @@
 		3D46E6311E258DFC0090C97B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3D46E6331E258DFC0090C97B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		98088A1F6C53F47AD0685D99 /* Pods-OurPlanet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OurPlanet.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OurPlanet/Pods-OurPlanet.debug.xcconfig"; sourceTree = "<group>"; };
+		A233F2BE1F6CE65D00808B93 /* RxCocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxCocoa.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/OurPlanet-gkerkpawsevjvxgqhoonnjcqivix/Build/Products/Debug-iphonesimulator/RxCocoa/RxCocoa.framework"; sourceTree = "<group>"; };
+		A233F2C01F6CE66100808B93 /* RxSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RxSwift.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/OurPlanet-gkerkpawsevjvxgqhoonnjcqivix/Build/Products/Debug-iphonesimulator/RxSwift/RxSwift.framework"; sourceTree = "<group>"; };
+		A24D94861F6241550013B8AC /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = MyPlayground.playground; sourceTree = "<group>"; };
 		D8D4B16B4BA42E13E4F7DBB2 /* EOCategory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EOCategory.swift; sourceTree = "<group>"; };
 		D8D4B1AF36E540D16E9AC066 /* EventsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventsViewController.swift; sourceTree = "<group>"; };
 		D8D4B590E2532FBB4E15A320 /* EventCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EventCell.swift; sourceTree = "<group>"; };
@@ -47,6 +52,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A233F2C11F6CE66100808B93 /* RxSwift.framework in Frameworks */,
+				A233F2BF1F6CE65D00808B93 /* RxCocoa.framework in Frameworks */,
 				C9EE84558065F39B6F4F65B4 /* Pods_OurPlanet.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -75,14 +82,15 @@
 		3D46E6261E258DFC0090C97B /* OurPlanet */ = {
 			isa = PBXGroup;
 			children = (
+				A24D94861F6241550013B8AC /* MyPlayground.playground */,
 				3D46E6271E258DFC0090C97B /* AppDelegate.swift */,
 				3D46E6291E258DFC0090C97B /* CategoriesViewController.swift */,
+				D8D4B1AF36E540D16E9AC066 /* EventsViewController.swift */,
+				D8D4B590E2532FBB4E15A320 /* EventCell.swift */,
 				3D46E62B1E258DFC0090C97B /* Main.storyboard */,
 				3D46E62E1E258DFC0090C97B /* Assets.xcassets */,
 				3D46E6301E258DFC0090C97B /* LaunchScreen.storyboard */,
 				3D46E6331E258DFC0090C97B /* Info.plist */,
-				D8D4B1AF36E540D16E9AC066 /* EventsViewController.swift */,
-				D8D4B590E2532FBB4E15A320 /* EventCell.swift */,
 				D8D4B8DAB960CC6D73230C61 /* Model */,
 			);
 			path = OurPlanet;
@@ -91,6 +99,8 @@
 		6D4D14FEC5816E8A07B9F4A2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A233F2C01F6CE66100808B93 /* RxSwift.framework */,
+				A233F2BE1F6CE65D00808B93 /* RxCocoa.framework */,
 				1EF74F7158FA18FD08C3F92F /* Pods_OurPlanet.framework */,
 			);
 			name = Frameworks;
@@ -231,7 +241,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

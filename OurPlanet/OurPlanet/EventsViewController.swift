@@ -24,29 +24,75 @@ import UIKit
 import RxSwift
 
 class EventsViewController : UIViewController, UITableViewDataSource {
+    
+    @IBOutlet var tableView: UITableView!
+    @IBOutlet var slider: UISlider!
+    @IBOutlet var daysLabel: UILabel!
+    
+    let events = Variable<[EOEvent]>([])
+    let disposeBag = DisposeBag()
+    
+    let days = Variable<Int>(360)
+    let filteredEvents = Variable<[EOEvent]>([])
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 60
+        
+        events.asObservable()
+            .subscribe(onNext: { [weak self] _ in
+                self?.tableView.reloadData()
+            })
+            .disposed(by: disposeBag)
 
-  @IBOutlet var tableView: UITableView!
-  @IBOutlet var slider: UISlider!
-  @IBOutlet var daysLabel: UILabel!
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    tableView.rowHeight = UITableViewAutomaticDimension
-    tableView.estimatedRowHeight = 60
-  }
-
-  @IBAction func sliderAction(slider: UISlider) {
-  }
-  
-  // MARK: UITableViewDataSource
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 0
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "eventCell") as! EventCell
-    return cell
-  }
-  
+        
+        Observable.combineLatest(days.asObservable(), events.asObservable()) {
+            (days, events) -> [EOEvent] in
+            let maxInterval = TimeInterval(days * 24 * 3600)
+            return events.filter { event in
+                
+                // event.closeDate 가 maxInterval보다 작은 event만 추출
+                if let date = event.closeDate {
+                    return abs(date.timeIntervalSinceNow) < maxInterval
+                }
+                return true
+            }
+        }
+            // 그 필터링한 이벤트배열을 filteredEvents 배열에 쳐 넣음
+            .bind(to: filteredEvents)
+            .disposed(by: disposeBag)
+        
+        // 필터링된 이벤트 배열을 구독
+        filteredEvents.asObservable()
+            .subscribe(onNext: { [weak self] _ in
+                self?.tableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+        
+        days.asObservable()
+            .subscribe(onNext: { days in
+                self.daysLabel.text = "Last \(days) days"
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    @IBAction func sliderAction(slider: UISlider) {
+        days.value = Int(slider.value)
+    }
+    
+    // MARK: UITableViewDataSource
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return filteredEvents.value.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "eventCell") as! EventCell
+        
+        let event = filteredEvents.value[indexPath.row]
+        cell.configure(event: event)
+        return cell
+    }
+    
 }

@@ -25,28 +25,107 @@ import RxSwift
 import RxCocoa
 
 class CategoriesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-
-  @IBOutlet var tableView: UITableView!
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    startDownload()
-  }
-
-  func startDownload() {
     
-  }
-  
-  // MARK: UITableViewDataSource
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 0
-  }
-  
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell")!
-    return cell
-  }
-  
+    @IBOutlet var tableView: UITableView!
+    
+    let categories = Variable<[EOCategory]>([])
+    let disposeBag = DisposeBag()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        categories
+          .asObservable()
+            .subscribe(onNext: { [weak self] _ in
+                print(Thread.isMainThread)
+                DispatchQueue.main.async {
+                    self?.tableView?.reloadData()
+                }
+            })
+         .disposed(by: disposeBag)
+        
+        startDownload()
+    }
+    
+    func startDownload() {
+        
+        let eoCategories = EONET.categories
+       // let downloadedEvent = EONET.events(forLast: 360) // 모든이벤트를 취득했었다.
+        
+        let downloadedEvent = eoCategories.flatMap { categories in
+            
+            //categories안의 각 category요소를 observable로 변경한다.
+            return Observable.from(categories.map { category in
+                EONET.events(forLast: 360, category: category)
+            })
+        }
+        .merge()
+        
+        
+        let updateCategories = Observable.combineLatest(eoCategories, downloadedEvent) {
+            (categories, events) -> [EOCategory] in
+            
+            // categories안의 각 category에 대해서 events의 categories 안에 해당 id 가 있는 것만 추출해서 
+            // 자기 category안의 events 에 넣음
+            return categories.map { category in
+                var cat = category
+                cat.events = events.filter {
+                    $0.categories.contains(category.id)
+                }
+                return cat
+            }
+        }
+        
+        eoCategories
+            .concat(updateCategories)
+            .bind(to: categories)
+            .disposed(by: disposeBag)
+        
+    }
+    
+    // MARK: UITableViewDataSource
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return categories.value.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell")!
+        
+        let category = categories.value[indexPath.row]
+        cell.textLabel?.text = "\(category.name) (\(category.events.count))"
+        cell.accessoryType = (category.events.count > 0) ? .disclosureIndicator : .none
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let category = categories.value[indexPath.row]
+        if !category.events.isEmpty {
+            
+            let eventsController = storyboard!.instantiateViewController(withIdentifier: "events") as! EventsViewController
+            
+            eventsController.title = category.name
+            //해당 카테고리의 이벤트들을 넘김
+            eventsController.events.value = category.events
+            navigationController!.pushViewController(eventsController, animated: true)
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

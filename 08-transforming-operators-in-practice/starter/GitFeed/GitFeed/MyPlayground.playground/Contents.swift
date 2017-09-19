@@ -4,9 +4,15 @@ import UIKit
 import RxSwift
 
 
-let source = Observable.of(1,2,3,4,5)
+let left = PublishSubject<String>()
+let right = PublishSubject<String>()
 
-let observable = source.scan(0, accumulator: +)
-    .subscribe(onNext: {
-        print($0)
-    })
+let obaservable = left.amb(right)
+let disposable = obaservable.subscribe(onNext: {
+    print($0)
+})
+
+left.onNext("a")
+right.onNext("aa")
+
+disposable.dispose()
